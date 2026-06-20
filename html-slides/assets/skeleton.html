@@ -1415,6 +1415,74 @@
       font-size: 0.92em;
     }
 
+
+    /* ===== 面试/高密度模式：字号放大 + 面试组件（Q&A / 架构图 / 深度徽章 / 要点框）===== */
+    .slide-title, .slide.dense .slide-title { font-size: clamp(34px, 2.9cqi, 50px) !important; }
+    .title { font-size: clamp(38px, 3.3cqi, 58px) !important; line-height: 1.25 !important; }
+    .lead, .hero-lead { font-size: clamp(19px, 1.5cqi, 26px) !important; line-height: 1.6 !important; }
+    .kicker { font-size: clamp(15px, 1.1cqi, 19px) !important; letter-spacing: 0.04em !important; }
+    .chip { font-size: 16px !important; }
+    .card h3 { font-size: clamp(22px, 1.8cqi, 27px) !important; }
+    .card p { font-size: clamp(17px, 1.38cqi, 22px) !important; line-height: 1.6 !important; }
+    .big-number { font-size: clamp(48px, 3.8cqi, 62px) !important; }
+    .agent-module strong { font-size: 20px !important; }
+    .agent-module span { font-size: 15px !important; line-height: 1.5 !important; }
+    .agent-module small { font-size: 13px !important; }
+    .path-step strong { font-size: 20px !important; }
+    .path-step span { font-size: 15px !important; line-height: 1.5 !important; }
+    .node strong { font-size: 19px !important; }
+    .node span { font-size: 15px !important; line-height: 1.55 !important; }
+    .material-table, .slide.dense .material-table { font-size: 16px !important; }
+    .material-table th, .material-table td,
+    .slide.dense .material-table th, .slide.dense .material-table td {
+      font-size: 15px !important; padding: 11px 13px !important; line-height: 1.5 !important;
+    }
+    .material-table td:first-child { width: auto !important; }
+    .note p { font-size: 18px !important; line-height: 1.6 !important; }
+    .note .label { font-size: 14px !important; }
+    .code-block { font-size: 15px !important; line-height: 1.65 !important; }
+
+    /* 架构分层图 */
+    .arch { display: flex; flex-direction: column; align-items: stretch; gap: 0; margin-top: 22px; }
+    .arch-tier { display: flex; gap: 14px; justify-content: center; }
+    .arch-node {
+      flex: 1; max-width: 300px; padding: 15px 16px; text-align: center;
+      background: #fffdf9; border: 1px solid var(--line); border-radius: var(--radius);
+      border-top: 4px solid var(--blue);
+    }
+    .arch-node.ag { border-top-color: var(--green); }
+    .arch-node.ac { border-top-color: var(--coral); }
+    .arch-node.al { border-top-color: var(--lavender); }
+    .arch-node.ao { border-top-color: var(--gold); }
+    .arch-node strong { display: block; font-size: 19px; margin-bottom: 5px; color: var(--ink); }
+    .arch-node span { color: var(--muted); font-size: 14px; line-height: 1.5; display: block; }
+    .arch-node .mono { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; color: var(--blue); display: block; margin-top: 3px; }
+    .arch-arrow { margin: 9px 0; display: flex; align-items: center; gap: 10px; color: var(--nav-muted); font-size: 14px; justify-content: center; }
+    .arch-arrow::before, .arch-arrow::after { content: ""; flex: 1; height: 1px; background: var(--line-strong); max-width: 140px; }
+    .arch-arrow .lbl { background: var(--paper-deep); padding: 2px 12px; border-radius: 4px; }
+
+    /* Q&A 卡片（面试官问题 + 心理 + 第一人称话术）*/
+    .qa { background: #fffdf9; border: 1px solid var(--line); border-left: 4px solid var(--coral);
+          border-radius: var(--radius); padding: 16px 20px; margin-top: 14px; }
+    .qa + .qa { margin-top: 12px; }
+    .qa-q { font-size: 19px; font-weight: 700; color: var(--ink); margin-bottom: 6px; line-height: 1.4; }
+    .qa-q::before { content: "Q  "; color: var(--coral); font-weight: 800; }
+    .qa-mind { display: block; font-size: 14px; color: var(--faint); margin-bottom: 10px; line-height: 1.5; }
+    .qa-mind::before { content: "🎯 面试官心理："; color: var(--gold); font-weight: 600; }
+    .qa-a { font-size: 16.5px; line-height: 1.72; color: var(--ink); }
+    .qa-a::before { content: "A  "; color: var(--green); font-weight: 800; }
+
+    /* 深度徽章 / 要点框 */
+    .depth { display: inline-block; font-size: 13px; padding: 2px 9px; border-radius: 4px; margin-left: 10px; font-weight: 600; vertical-align: middle; }
+    .depth.green { background: rgba(62,126,116,.15); color: var(--green); }
+    .depth.yellow { background: rgba(170,122,54,.18); color: var(--gold); }
+    .depth.red { background: rgba(199,103,82,.16); color: var(--coral); }
+    .takeaway { background: linear-gradient(90deg, rgba(74,111,145,.12), transparent 74%), rgba(255,255,255,.68);
+                border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 20px; margin-top: 16px; }
+    .takeaway .label { display: inline-block; margin-bottom: 8px; color: var(--blue); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+    .takeaway p { font-size: 17px; line-height: 1.6; margin: 4px 0; }
+    .takeaway strong { color: var(--ink); }
+
   </style>
 </head>
 
@@ -1614,6 +1682,24 @@ func (s *OrderService) Create(ctx, cmd) (*Order, error) {
             <p class="lead animate" style="--i: 2; margin-top: 24px">
               2–3 句总结全文，并指出可以继续深入的方向（某个模块、某段实现）。
             </p>
+          </div>
+        </section>
+
+
+        <!-- 组件预览：Q&A 卡片 / 深度徽章 / 要点框 / 架构图 -->
+        <section class="slide dense" data-title="组件预览" data-nav="组件预览">
+          <div class="slide-inner">
+            <p class="kicker animate" style="--i: 0">可选组件预览</p>
+            <h2 class="slide-title animate" style="--i: 1">面试笔记组件：Q&A / 深度徽章 / 要点框</h2>
+            <div class="qa animate" style="--i: 2">
+              <p class="qa-q">这是一个示例面试问题？<span class="depth green">🟢 深入</span></p>
+              <span class="qa-mind">用一句话写清面试官真正在考察什么（不要太泛）。</span>
+              <p class="qa-a">第一人称话术，像在面试现场说话，不是写技术文档。带具体细节和埋钩子。</p>
+            </div>
+            <div class="takeaway animate" style="--i: 3">
+              <span class="label">要点 / 钩子</span>
+              <p>要点框用于强调关键结论或埋钩子提示。<strong>只埋自己能接住的钩子</strong>。</p>
+            </div>
           </div>
         </section>
 

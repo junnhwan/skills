@@ -213,3 +213,61 @@ func (s *OrderService) Create(ctx, cmd) (*Order, error) {
 ## Cover 页专用组件
 
 Cover 用 `.title`（不是 slide-title）、`.lead.hero-lead`、`.hero-meta`、`.chips`。完整结构见 `templates.md` 的 Cover 模板。
+
+---
+
+## 面试专用组件（Q&A 卡片 / 架构图 / 深度徽章 / 要点框）
+
+做面试笔记（对齐 `project-grill-prep` 的拷打准备）时用。CSS 已在 `skeleton.html` 内置，照抄 class 即生效。详见 `templates.md` 的「面试笔记五层模板」。
+
+### Q&A 卡片（最核心）
+
+```html
+<div class="qa animate" style="--i: 2">
+  <p class="qa-q">面试官的问题？</p>
+  <span class="qa-mind">一句话写清面试官真正在考察什么，不要写"考察XX能力"这种泛话。</span>
+  <p class="qa-a">第一人称话术，像在面试现场说话，不是写技术文档。</p>
+</div>
+```
+
+- `qa-q`：问题（珊瑚色 `Q` 前缀）。`qa-mind`：🎯 面试官心理（淡灰小字）。`qa-a`：回答（绿色 `A` 前缀）。
+- 一个 Q&A 卡片占较大空间，一页放 1–3 个。
+
+### 架构分层图（arch）
+
+画系统拓扑：客户端 → API → MQ → Consumer → 存储，层间带连接线。
+
+```html
+<div class="arch">
+  <div class="arch-tier">
+    <div class="arch-node ag animate" style="--i:2"><strong>组件名</strong><span>职责说明</span><span class="mono">备注/配置</span></div>
+    <div class="arch-node ac animate" style="--i:3"><strong>组件名</strong><span>职责说明</span></div>
+  </div>
+  <div class="arch-arrow animate" style="--i:4"><span class="lbl">层间连接说明（投递 / 消费 / 落盘）</span></div>
+  <div class="arch-tier">...更多节点...</div>
+</div>
+```
+
+- `arch-node` 颜色修饰符：`ag`(绿) / `ac`(珊瑚) / `al`(紫) / `ao`(金)，控制顶部 4px 彩色条。
+- `arch-arrow .lbl`：层间带标签的连接线，用于表达数据流向。
+
+### 深度徽章（depth）
+
+```html
+<span class="depth green">🟢 深入</span>
+<span class="depth yellow">🟡 基本</span>
+<span class="depth red">🔴 仅会用</span>
+```
+
+标在亮点标题或 Q&A 问题后，表示该点的准备深度。**必须基于真实掌握度校准**——标 🟢 但答不上，比主动说"了解不深"扣分重。
+
+### 要点框（takeaway）
+
+```html
+<div class="takeaway animate" style="--i: 6">
+  <span class="label">要点 / 钩子</span>
+  <p>强调关键结论或埋钩子提示。</p>
+</div>
+```
+
+和 `note` 类似但蓝色调，用于「关键决策」「话术钩子」等强调。
