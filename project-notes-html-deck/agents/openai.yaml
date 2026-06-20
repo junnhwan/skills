@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Notes HTML Deck"
+  short_description: "Turn unfamiliar codebases into visual HTML notes"
+  default_prompt: "Use $project-notes-html-deck to read this project and generate a visual HTML note deck."
