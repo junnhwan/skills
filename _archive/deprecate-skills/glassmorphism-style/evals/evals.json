@@ -1,0 +1,54 @@
+{
+  "skill_name": "glassmorphism-style",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我做一个项目管理的落地页（landing page），需要有英雄区、特性展示区、和底部CTA区域",
+      "expected_output": "完整的React+TSX落地页，包含英雄区（5rem/900 gradient标题）、4列feature grid、glassmorphism风格卡片、mesh gradient+noise背景、Framer Motion入场动画",
+      "files": [],
+      "expectations": [
+        "Uses #fdfbf7 as background color",
+        "Uses glass-bg rgba(255,255,255,0.7) for cards",
+        "Has backdrop-filter: blur on glass panels",
+        "Hero title uses gradient text with background-clip",
+        "Uses Inter font family",
+        "Uses Framer Motion for entrance animations",
+        "Includes mesh gradient background layer",
+        "Border radius values are in 12-32px range",
+        "Uses #38bdf8 as primary accent color"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "帮我做一个数据监控dashboard页面，左侧有侧边栏显示项目列表，中间是主工作区，右侧有统计面板",
+      "expected_output": "三面板布局的dashboard页面，glass sidebar(320px)+flex center+glass stats panel(380px)，stat-item卡片，进度条动画，Framer Motion过渡效果",
+      "files": [],
+      "expectations": [
+        "Has three-panel layout with glass sidebar and stats panel",
+        "Sidebar uses rgba(248,250,252,0.4) background with blur",
+        "Stats panel uses rgba(255,255,255,0.4) background with blur",
+        "Stat items show big numbers (1.5rem/900) with small labels (0.75rem uppercase)",
+        "Progress bar uses azure-to-deep gradient",
+        "Has Framer Motion animations on card entries",
+        "Uses premium-card pattern for content sections",
+        "Custom scrollbar styling present"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "帮我做一个代码审查报告的详情页面，需要有tab切换（概览和报告两个tab），底部显示finding列表，finding有不同的严重程度（critical/high/medium）",
+      "expected_output": "带tab切换的详情页面，AnimatePresence过渡，finding列表带severity左条指示器，markdown渲染区，thinking-dot pulse动画",
+      "files": [],
+      "expectations": [
+        "Has AnimatePresence tab transitions with enter/exit animations",
+        "Finding items have colored left-bar ::before pseudo-element",
+        "Critical findings use #ef4444 with glow shadow",
+        "High severity uses #f97316 orange",
+        "Medium severity uses #f59e0b amber",
+        "Markdown content has custom heading/body styling",
+        "Has thinking pulse animation or equivalent loading state",
+        "Uses label-xs uppercase style for section markers"
+      ]
+    }
+  ]
+}

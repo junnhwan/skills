@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Interview Prep"
+  short_description: "Turn backend projects into interview prep"
+  default_prompt: "Use $prepare-project-interview to prepare my backend project for resume and interview drilling."

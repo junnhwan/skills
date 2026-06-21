@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Defense Coach"
+  short_description: "Turn vibe-coded projects into interview defense"
+  default_prompt: "Use $project-defense-coach to prepare my AI-assisted backend project for resume and interview defense."

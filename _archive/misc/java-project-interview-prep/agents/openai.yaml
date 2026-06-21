@@ -1,0 +1,4 @@
+interface:
+  display_name: "Java Project Interview Prep"
+  short_description: "Build interview-ready Java project docs"
+  default_prompt: "Use $java-project-interview-prep to turn my Java project into resume bullets, grilling questions, and defensible interview answers."

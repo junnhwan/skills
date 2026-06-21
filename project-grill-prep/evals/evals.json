@@ -1,0 +1,23 @@
+{
+  "skill_name": "project-grill-prep",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "帮我分析这个项目，生成面试拷打准备文档。项目目录是 D:\\ai-chat\\test-project",
+      "expected_output": "应该先扫描项目结构，识别技术栈，然后和用户确认技术亮点，再按五层结构生成面试准备文档",
+      "files": []
+    },
+    {
+      "id": 2,
+      "prompt": "我简历上写了'引入 Redis 实现分布式锁防止重复提交'，帮我针对这个点准备面试",
+      "expected_output": "应该针对分布式锁这个技术点按五层结构展开：痛点（重复提交问题）→ 选型（SETNX vs Redisson vs ZooKeeper）→ 实现流程 → Q&A模拟 → 兜底场景",
+      "files": []
+    },
+    {
+      "id": 3,
+      "prompt": "我要准备简历项目的面试拷打，我的项目是一个用 Go 写的短链接服务，用了 Redis 做缓存、MySQL 存数据、Kafka 做异步削峰",
+      "expected_output": "应该分析技术栈，提取出简历级别的技术亮点（如 Kafka 异步削峰、Redis 缓存策略等），然后按五层结构生成文档",
+      "files": []
+    }
+  ]
+}

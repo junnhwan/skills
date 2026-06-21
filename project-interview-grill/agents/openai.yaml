@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Interview Grill"
+  short_description: "Audit resume claims and prep project grilling"
+  default_prompt: "Use $project-interview-grill to audit my project resume claims, write defensible bullets, and prepare interview grilling questions."
