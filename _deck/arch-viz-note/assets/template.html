@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>架构图解 · 模板</title>
+<style>
+  :root[data-theme="light"]{--bg:#f7f7f8;--surface:#fff;--surface-2:#f3f4f6;--border:#e5e7eb;--text:#18181b;--dim:#71717a;--accent:#3b82f6;--code-bg:#f4f4f5;}
+  :root[data-theme="dark"]{--bg:#09090b;--surface:#18181b;--surface-2:#27272a;--border:#3f3f46;--text:#fafafa;--dim:#a1a1aa;--accent:#60a5fa;--code-bg:#18181b;}
+  *{box-sizing:border-box;}html,body{margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.7;transition:background .3s,color .3s;}
+  .wrap{max-width:960px;margin:0 auto;padding:32px 20px 80px;}
+  .eyebrow{display:inline-block;font-family:ui-monospace,monospace;font-size:13px;font-weight:700;background:var(--surface-2);padding:3px 10px;border-radius:8px;margin-bottom:10px;}
+  h1.title{font-size:30px;margin:0 0 6px;letter-spacing:-.02em;}
+  p.subtitle{color:var(--dim);margin:0;}
+  .toolbar{display:flex;justify-content:flex-end;margin:14px 0 24px;}
+  .theme-btn{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:13px;cursor:pointer;}
+  .theme-btn:hover{background:var(--surface-2);}
+
+  .diagram-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px;}
+  .diagram-card h2{font-size:19px;margin:0 0 14px;letter-spacing:-.01em;}
+  .mermaid-wrap{display:flex;justify-content:center;background:var(--surface-2);border-radius:10px;padding:18px;overflow:auto;}
+  .mermaid-wrap .mermaid{background:transparent !important;}
+  .caption{color:var(--dim);font-size:14px;margin:12px 0 0;}
+  .load-warn{color:var(--dim);font-size:13px;text-align:center;padding:40px 0;}
+
+  .prose h2{font-size:22px;margin:32px 0 12px;}
+  .prose h3{font-size:18px;margin:24px 0 8px;}
+  .prose p{margin:10px 0;}
+  .prose ul,.prose ol{margin:10px 0;padding-left:22px;}
+  .prose li{margin:4px 0;}
+  .prose code{font-family:ui-monospace,monospace;font-size:.88em;background:var(--code-bg);padding:2px 6px;border-radius:5px;border:1px solid var(--border);}
+  .prose pre{background:var(--code-bg);border:1px solid var(--border);border-radius:8px;padding:14px 16px;overflow-x:auto;margin:14px 0;}
+  .prose pre code{background:none;border:none;padding:0;font-size:13px;}
+  .prose blockquote{border-left:3px solid var(--accent);margin:14px 0;padding:4px 16px;color:var(--dim);background:var(--surface-2);border-radius:0 8px 8px 0;}
+  .prose strong{color:var(--text);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="eyebrow" id="eyebrow">ARCH</span>
+    <h1 class="title" id="doc-title">载入中…</h1>
+    <p class="subtitle" id="doc-subtitle"></p>
+    <div class="toolbar"><button class="theme-btn" id="theme-toggle">☀️ 浅色</button></div>
+  </header>
+
+  <div id="diagrams"></div>
+  <article class="prose" id="prose"></article>
+</div>
+
+<!-- mermaid via CDN：首次打开需联网；离线见 SKILL.md 的预渲染说明 -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js" onload="onMermaidLoaded()"></script>
+<script>
+/* ================================================================
+   ★ 唯一要改的地方：DATA ★
+   diagrams[] 每项是一段 mermaid 文本；语法见 references/mermaid-cheatsheet.md
+   ================================================================ */
+const DATA = {
+  meta: {
+    eyebrow: "BONDCODE · ARCH",
+    title: "BondCode 架构总览",
+    subtitle: "TUI → 应用层 → Agent 运行时 → 工具/安全/上下文/记忆",
+  },
+  diagrams: [
+    { title: "分层架构",
+      mermaid: `flowchart TD
+  subgraph 展示层
+    TUI["TUI (Bubble Tea)"]
+  end
+  subgraph 应用层
+    APP["app / cli / command"]
+  end
+  subgraph 运行时
+    LOOP["agent.Loop"]
+  end
+  subgraph 能力层
+    LLM["llm"]
+    TOOL["tool.Registry"]
+    SAFETY["safety.Policy"]
+    CTX["contextx.Governor"]
+    MEM["memory"]
+    SUB["subagent"]
+  end
+  TUI --> APP --> LOOP
+  LOOP --> LLM
+  LOOP --> TOOL --> SAFETY
+  LOOP --> CTX
+  LOOP --> MEM
+  LOOP --> SUB`,
+      caption: "四层：展示 → 应用 → 运行时 → 能力。agent.Loop 是唯一的调度者，所有能力挂在它下面。" },
+    { title: "核心包依赖",
+      mermaid: `flowchart LR
+  agent --> llm
+  agent --> tool
+  agent --> safety
+  agent --> contextx
+  agent --> subagent
+  agent --> memory
+  tool --> safety
+  subagent --> agent
+  app --> agent
+  app --> tui`,
+      caption: "注意 subagent 反向依赖 agent（子任务复用主 Loop），形成受限回环。" },
+  ],
+  content: `
+## 设计取舍
+
+- **local-first**：不依赖 MySQL/Redis/消息队列。状态全在本地 JSONL + Markdown。
+- **单调度者**：只有 \`agent.Loop\` 调模型和工具，其余包都是被调用的能力，避免多处直接碰模型。
+- **安全前置**：\`safety.Policy\` 挡在 \`tool\` 执行前，\`--yes\` 也绕不过 high 风险。
+
+## 想深入每条链路怎么跑
+
+架构图说"是什么"，具体流程看配套的 step-viz 动效笔记：
+
+- Agent Loop 怎么一步步转 → \`agent-loop.html\`
+- 上下文怎么治理 → \`context-governor.html\`
+- 子任务怎么编排 → \`subagent.html\`
+`,
+};
+
+/* ===== 渲染引擎（一般不用改）===== */
+const $ = (id) => document.getElementById(id);
+let currentTheme = "dark";
+
+function inlineMd(s) {
+  return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+}
+
+function renderDiagrams(theme) {
+  const host = $("diagrams");
+  host.innerHTML = "";
+  DATA.diagrams.forEach((d, i) => {
+    const card = document.createElement("section");
+    card.className = "diagram-card";
+    const cap = d.caption ? `<p class="caption">${inlineMd(d.caption)}</p>` : "";
+    card.innerHTML = `<h2>${inlineMd(d.title)}</h2><div class="mermaid-wrap"><div class="mermaid" id="m${i}"></div></div>${cap}`;
+    host.appendChild(card);
+    $("m" + i).textContent = d.mermaid;
+  });
+  if (typeof mermaid === "undefined") {
+    host.querySelectorAll(".mermaid").forEach((el, i) => {
+      const p = document.createElement("div");
+      p.className = "load-warn";
+      p.textContent = "⚠ mermaid 未加载（需联网）。源码：" + DATA.diagrams[i].mermaid.split("\n")[0] + " …";
+      el.parentNode.replaceChild(p, el);
+    });
+    return;
+  }
+  mermaid.initialize({ startOnLoad: false, theme: theme === "dark" ? "dark" : "default", securityLevel: "loose", flowchart: { curve: "basis" } });
+  mermaid.run({ querySelector: ".mermaid" }).catch((e) => console.warn("mermaid render error:", e));
+}
+
+function renderMarkdown(md) {
+  const lines = md.trim().split("\n");
+  let html = "", inCode = false, inUl = false, inOl = false;
+  const close = () => { if (inUl) { html += "</ul>"; inUl = false; } if (inOl) { html += "</ol>"; inOl = false; } };
+  const inline = (s) => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/`([^`]+)`/g,"<code>$1</code>").replace(/\*\*([^*]+)\*\*/g,"<strong>$1</strong>");
+  for (const line of lines) {
+    if (line.trim().startsWith("```")) { if (inCode) { html += "</code></pre>"; inCode = false; } else { close(); html += "<pre><code>"; inCode = true; } continue; }
+    if (inCode) { html += line + "\n"; continue; }
+    if (/^###\s/.test(line)) { close(); html += `<h3>${inline(line.slice(3).trim())}</h3>`; continue; }
+    if (/^##\s/.test(line)) { close(); html += `<h2>${inline(line.slice(2).trim())}</h2>`; continue; }
+    if (/^#\s/.test(line)) { close(); html += `<h2>${inline(line.slice(1).trim())}</h2>`; continue; }
+    if (/^>\s?/.test(line)) { close(); html += `<blockquote>${inline(line.replace(/^>\s?/,""))}</blockquote>`; continue; }
+    if (/^\s*[-*]\s+/.test(line)) { if (!inUl) { close(); html += "<ul>"; inUl = true; } html += `<li>${inline(line.replace(/^\s*[-*]\s+/,""))}</li>`; continue; }
+    if (/^\s*\d+\.\s+/.test(line)) { if (!inOl) { close(); html += "<ol>"; inOl = true; } html += `<li>${inline(line.replace(/^\s*\d+\.\s+/,""))}</li>`; continue; }
+    if (line.trim() === "") { close(); continue; }
+    close(); html += `<p>${inline(line.trim())}</p>`;
+  }
+  if (inCode) html += "</code></pre>";
+  close();
+  return html;
+}
+
+function applyTheme(theme) {
+  currentTheme = theme;
+  document.documentElement.setAttribute("data-theme", theme);
+  $("theme-toggle").textContent = theme === "dark" ? "☀️ 浅色" : "🌙 深色";
+  renderDiagrams(theme);
+}
+
+function onMermaidLoaded() { renderDiagrams(currentTheme); }
+
+function init() {
+  $("eyebrow").textContent = DATA.meta.eyebrow || "ARCH";
+  $("doc-title").textContent = DATA.meta.title;
+  $("doc-subtitle").textContent = DATA.meta.subtitle || "";
+  $("prose").innerHTML = renderMarkdown(DATA.content || "");
+  $("theme-toggle").onclick = () => applyTheme(currentTheme === "dark" ? "light" : "dark");
+  // 若 CDN 已先于本脚本就绪（onload 已触发），直接渲染
+  if (typeof mermaid !== "undefined") renderDiagrams(currentTheme);
+}
+init();
+</script>
+</body>
+</html>
