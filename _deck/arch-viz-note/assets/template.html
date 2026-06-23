@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>架构图解 · 模板</title>
 <style>
-  :root[data-theme="light"]{--bg:#f7f7f8;--surface:#fff;--surface-2:#f3f4f6;--border:#e5e7eb;--text:#18181b;--dim:#71717a;--accent:#3b82f6;--code-bg:#f4f4f5;}
-  :root[data-theme="dark"]{--bg:#09090b;--surface:#18181b;--surface-2:#27272a;--border:#3f3f46;--text:#fafafa;--dim:#a1a1aa;--accent:#60a5fa;--code-bg:#18181b;}
+  :root[data-theme="light"]{--bg:#f7f7f8;--surface:#fff;--surface-2:#f3f4f6;--border:#e5e7eb;--text:#18181b;--dim:#71717a;--accent:#3b82f6;--code-bg:#f4f4f5;--mermaid-bg:#fafbfc;}
+  :root[data-theme="dark"]{--bg:#09090b;--surface:#18181b;--surface-2:#27272a;--border:#3f3f46;--text:#fafafa;--dim:#a1a1aa;--accent:#60a5fa;--code-bg:#18181b;--mermaid-bg:#fafbfc;}
   *{box-sizing:border-box;}html,body{margin:0;padding:0;}
   body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--text);line-height:1.7;transition:background .3s,color .3s;}
   .wrap{max-width:960px;margin:0 auto;padding:32px 20px 80px;}
-  .eyebrow{display:inline-block;font-family:ui-monospace,monospace;font-size:13px;font-weight:700;background:var(--surface-2);padding:3px 10px;border-radius:8px;margin-bottom:10px;}
+  .eyebrow{display:inline-block;font-family:ui-monospace,monospace;font-size:13px;font-weight:700;background:var(--surface-2);color:var(--text);padding:3px 10px;border-radius:8px;margin-bottom:10px;}
   h1.title{font-size:30px;margin:0 0 6px;letter-spacing:-.02em;}
   p.subtitle{color:var(--dim);margin:0;}
   .toolbar{display:flex;justify-content:flex-end;margin:14px 0 24px;}
@@ -19,10 +19,28 @@
 
   .diagram-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:20px;}
   .diagram-card h2{font-size:19px;margin:0 0 14px;letter-spacing:-.01em;}
-  .mermaid-wrap{display:flex;justify-content:center;background:var(--surface-2);border-radius:10px;padding:18px;overflow:auto;}
-  .mermaid-wrap .mermaid{background:transparent !important;}
-  .caption{color:var(--dim);font-size:14px;margin:12px 0 0;}
+  /* 每张图的缩放工具条 */
+  .diagram-toolbar{display:flex;align-items:center;gap:6px;justify-content:flex-end;margin:0 0 10px;}
+  .toolbar-hint{font-family:ui-monospace,monospace;font-size:11px;color:var(--dim);margin-right:auto;}
+  .zoom-btn{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:6px;height:28px;font-size:15px;line-height:1;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0 8px;min-width:28px;}
+  .zoom-btn:hover{background:var(--surface-2);}
+  .zoom-btn.wide{font-size:12px;}
+  .zoom-label{font-family:ui-monospace,monospace;font-size:12px;color:var(--dim);min-width:46px;text-align:center;}
+  /* 图区固定浅色底——对齐项目手绘 SVG 的浅色画布，做缩放"视窗"（overflow 滚动） */
+  .mermaid-wrap{background:var(--mermaid-bg);border-radius:10px;padding:18px;overflow:auto;text-align:center;}
+  .mermaid-wrap .mermaid{background:transparent !important;display:inline-block;}
+  .caption{color:var(--dim);font-size:14px;margin:12px 0 0;text-align:left;}
   .load-warn{color:var(--dim);font-size:13px;text-align:center;padding:40px 0;}
+
+  /* 图例条（增量叙事）：对齐项目 SVG 底部那条 #f1f5f9 点题图例 */
+  .legend{display:flex;flex-wrap:wrap;gap:10px 20px;margin-top:14px;padding:10px 14px;background:var(--surface-2);border-radius:8px;}
+  .legend-item{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--text);}
+  .swatch{display:inline-block;width:13px;height:13px;border-radius:3px;flex:none;}
+  .swatch.core{background:#f0f4ff;border:1.5px solid #2563eb;}
+  .swatch.new{background:#ecfdf5;border:1.5px solid #16a34a;}
+  .swatch.emph{background:#fff7ed;border:1.5px solid #d97706;}
+  .swatch.dim{background:#f8fafc;border:1.5px solid #94a3b8;}
+  .swatch.data{background:#f8fafc;border:1.5px solid #64748b;}
 
   .prose h2{font-size:22px;margin:32px 0 12px;}
   .prose h3{font-size:18px;margin:24px 0 8px;}
@@ -49,78 +67,152 @@
   <article class="prose" id="prose"></article>
 </div>
 
-<!-- mermaid via CDN：首次打开需联网；离线见 SKILL.md 的预渲染说明 -->
-<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js" onload="onMermaidLoaded()"></script>
+<!-- mermaid：优先本地 mermaid.min.js（离线，随模板一起拷贝）；加载失败时 JS 自动回退 CDN -->
+<script src="mermaid.min.js"></script>
 <script>
 /* ================================================================
    ★ 唯一要改的地方：DATA ★
-   diagrams[] 每项是一段 mermaid 文本；语法见 references/mermaid-cheatsheet.md
+   - diagrams[] 每项：{ title, mermaid, caption?, legend? }
+   - mermaid 语法见 references/mermaid-cheatsheet.md
+   - 语义配色 core/new/emph/dim/data 已自动注入（仅 flowchart/graph），
+     节点直接写 X:::new 即可上色；legend 渲染成图下方色块条
    ================================================================ */
 const DATA = {
   meta: {
     eyebrow: "BONDCODE · ARCH",
     title: "BondCode 架构总览",
-    subtitle: "TUI → 应用层 → Agent 运行时 → 工具/安全/上下文/记忆",
+    subtitle: "单进程 Go CLI：接入 → 应用 → agent.Loop 调度 → 能力层 → JSONL 审计",
   },
   diagrams: [
     { title: "分层架构",
       mermaid: `flowchart TD
-  subgraph 展示层
-    TUI["TUI (Bubble Tea)"]
+  subgraph L1["展示层"]
+    TUI["tui · Bubble Tea"]
   end
-  subgraph 应用层
-    APP["app / cli / command"]
+  subgraph L2["接入层"]
+    CLI["cli · command"]
   end
-  subgraph 运行时
-    LOOP["agent.Loop"]
+  subgraph L3["应用层"]
+    APP["app 装配"]
   end
-  subgraph 能力层
-    LLM["llm"]
-    TOOL["tool.Registry"]
-    SAFETY["safety.Policy"]
-    CTX["contextx.Governor"]
-    MEM["memory"]
-    SUB["subagent"]
+  subgraph L4["运行时"]
+    LOOP["agent.Loop"]:::emph
   end
-  TUI --> APP --> LOOP
+  subgraph L5["能力层"]
+    LLM["llm"]:::core
+    TOOL["tool"]:::core
+    SAFETY["safety"]:::core
+    CTX["contextx"]:::core
+    MEM["memory"]:::core
+    SUB["subagent"]:::core
+    TODO["todo"]:::core
+    SKILL["skill"]:::core
+    MCP["mcp"]:::core
+  end
+  subgraph L6["持久化"]
+    SESS["session · JSONL"]:::data
+  end
+  TUI --> CLI --> APP --> LOOP
   LOOP --> LLM
-  LOOP --> TOOL --> SAFETY
+  LOOP --> TOOL
+  TOOL --> SAFETY
   LOOP --> CTX
   LOOP --> MEM
-  LOOP --> SUB`,
-      caption: "四层：展示 → 应用 → 运行时 → 能力。agent.Loop 是唯一的调度者，所有能力挂在它下面。" },
-    { title: "核心包依赖",
+  LOOP --> SUB
+  LOOP --> TODO
+  LOOP --> SKILL
+  LOOP --> MCP
+  APP --> SESS`,
+      caption: "五层：展示 → 接入 → 应用 → 运行时 → 能力。\`agent.Loop\` 是**唯一调度者**，所有能力挂在它下面；\`safety\` 挡在 \`tool\` 执行前。",
+      legend: [
+        { cls:"emph", text:"唯一调度者 agent.Loop" },
+        { cls:"core", text:"能力模块" },
+        { cls:"data", text:"持久化（JSONL 审计流）" },
+      ] },
+    { title: "最小闭环 vs 扩展能力",
       mermaid: `flowchart LR
-  agent --> llm
-  agent --> tool
-  agent --> safety
-  agent --> contextx
+  subgraph CORE["最小闭环（不可裁剪）"]
+    agent["agent.Loop"]:::dim
+    llm["llm"]:::dim
+    tool["tool"]:::dim
+    safety["safety"]:::dim
+    contextx["contextx"]:::dim
+    agent --> llm
+    agent --> tool
+    tool --> safety
+    agent --> contextx
+  end
+  subgraph EXT["扩展层（可拔插）"]
+    subagent["subagent"]:::new
+    todo["todo"]:::new
+    skill["skill"]:::new
+    mcp["mcp"]:::new
+    memory["memory"]:::new
+  end
   agent --> subagent
+  agent --> todo
+  agent --> skill
+  agent --> mcp
   agent --> memory
-  tool --> safety
-  subagent --> agent
-  app --> agent
-  app --> tui`,
-      caption: "注意 subagent 反向依赖 agent（子任务复用主 Loop），形成受限回环。" },
+  subagent -. "受限回环·复用主Loop" .-> agent`,
+      caption: "灰色=跑起来必须有的最小闭环；绿色=可按需裁剪的扩展层。\`subagent\` 反向依赖 \`agent\`（子任务复用主 Loop），形成受限回环。",
+      legend: [
+        { cls:"dim", text:"最小闭环（沿用核心）" },
+        { cls:"new", text:"扩展层（可裁剪）" },
+      ] },
   ],
   content: `
 ## 设计取舍
 
-- **local-first**：不依赖 MySQL/Redis/消息队列。状态全在本地 JSONL + Markdown。
-- **单调度者**：只有 \`agent.Loop\` 调模型和工具，其余包都是被调用的能力，避免多处直接碰模型。
-- **安全前置**：\`safety.Policy\` 挡在 \`tool\` 执行前，\`--yes\` 也绕不过 high 风险。
+- **local-first**：不依赖 MySQL/Redis/消息队列。状态全在本地——\`session\` 写 JSONL 审计流，\`memory\` 落 Markdown。
+- **单调度者**：只有 \`agent.Loop\` 调模型和工具，其余包都是被调用的能力，避免多处直接碰模型。\`loop_guard\` 做 max-step 保护，\`trace\` 记录每一步。
+- **安全前置**：\`safety\` 挡在 \`tool\` 执行前——\`command_guard\` 对 shell 命令分类，high 风险必须确认。
+- **Eino 边界**：Eino 的 message/tool 概念被关在 \`internal/llm\` 里，对外暴露稳定的 \`llm.Client\`；运行时用 Anthropic 兼容的 HTTP/SSE 适配器对接 BigModel，边界不外泄。
 
-## 想深入每条链路怎么跑
+## 上下文治理（contextx）
 
-架构图说"是什么"，具体流程看配套的 step-viz 动效笔记：
+BondCode 最厚的包，七个职责拼出"何时压缩、压什么、怎么留痕"：
 
-- Agent Loop 怎么一步步转 → \`agent-loop.html\`
-- 上下文怎么治理 → \`context-governor.html\`
-- 子任务怎么编排 → \`subagent.html\`
+- \`estimator\` — 估 token，逼近预算时触发
+- \`governor\` — 决定**何时**压缩
+- \`compactor\` — 执行压缩
+- \`summary\` / \`summary_store\` — 生成并落盘摘要
+- \`tool_result_store\` — 截断过旧的 tool 结果
+- \`mention\` — 处理 \`@\` 工程引用
+- \`project\` — 检视本地 Go 工程结构
+
+> 压缩只影响 prompt 构建，**不动 JSONL 原始审计流**。
+
+## 配套动效笔记
+
+架构图说"是什么"，具体链路怎么一步步跑，看 step-viz 流程型笔记：
+
+- Agent Loop 一步步怎么转
+- 上下文怎么治理、何时压缩
+- 子任务怎么编排、回环怎么收口
 `,
 };
 
 /* ===== 渲染引擎（一般不用改）===== */
+// 语义 classDef：对齐项目手绘 SVG 的配色体系（蓝核心/绿新增/橙强调/灰保留/灰虚数据）。
+// 只注入给 flowchart/graph 图；classDiagram/mindmap/erDiagram 不吃这套语法，按需跳过。
+const CLASSDEFS = `classDef core fill:#f0f4ff,stroke:#2563eb,color:#1e3a5f,stroke-width:1.6px
+classDef new fill:#ecfdf5,stroke:#16a34a,color:#166534,stroke-width:1.6px
+classDef emph fill:#fff7ed,stroke:#d97706,color:#92400e,stroke-width:2px
+classDef dim fill:#f8fafc,stroke:#94a3b8,color:#64748b,stroke-width:1.2px
+classDef data fill:#f8fafc,stroke:#64748b,color:#475569,stroke-width:1.2px,stroke-dasharray:4 2`;
+
+// base 主题 + themeVariables：图区始终浅色，明暗主题下 mermaid 不重渲染
+const THEME_VARS = {
+  background: "transparent",
+  fontFamily: 'system-ui,-apple-system,"PingFang SC","Microsoft YaHei",sans-serif',
+  fontSize: "14px",
+  primaryColor: "#f0f4ff", primaryBorderColor: "#2563eb", primaryTextColor: "#1e3a5f",
+  secondaryColor: "#fff7ed", tertiaryColor: "#ecfdf5",
+  lineColor: "#64748b", edgeLabelBackground: "#fafbfc",
+  clusterBkg: "transparent", clusterBorder: "#cbd5e1",
+};
+
 const $ = (id) => document.getElementById(id);
 let currentTheme = "dark";
 
@@ -129,28 +221,97 @@ function inlineMd(s) {
     .replace(/`([^`]+)`/g, "<code>$1</code>").replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
 }
 
-function renderDiagrams(theme) {
+function buildCards() {
   const host = $("diagrams");
   host.innerHTML = "";
   DATA.diagrams.forEach((d, i) => {
     const card = document.createElement("section");
     card.className = "diagram-card";
+    let legend = "";
+    if (Array.isArray(d.legend) && d.legend.length) {
+      legend = '<div class="legend">' + d.legend.map((it) =>
+        `<span class="legend-item"><span class="swatch ${it.cls || "core"}"></span>${inlineMd(it.text)}</span>`
+      ).join("") + "</div>";
+    }
     const cap = d.caption ? `<p class="caption">${inlineMd(d.caption)}</p>` : "";
-    card.innerHTML = `<h2>${inlineMd(d.title)}</h2><div class="mermaid-wrap"><div class="mermaid" id="m${i}"></div></div>${cap}`;
+    // classDef 必须注入在图类型声明（flowchart/graph）那行【之后】，不能放最前面——
+    // 否则 mermaid 把首行 classDef 当成未知图类型，整张图报 UnknownDiagramError。
+    const declIdx = d.mermaid.search(/^\s*(flowchart|graph)\b/m);
+    let src = d.mermaid;
+    if (declIdx !== -1) {
+      const lineEnd = d.mermaid.indexOf("\n", declIdx);
+      src = (lineEnd === -1)
+        ? d.mermaid + "\n" + CLASSDEFS
+        : d.mermaid.slice(0, lineEnd) + "\n" + CLASSDEFS + d.mermaid.slice(lineEnd);
+    }
+    card.innerHTML = `<h2>${inlineMd(d.title)}</h2>
+      <div class="diagram-toolbar">
+        <span class="toolbar-hint">Ctrl/⌘ + 滚轮缩放</span>
+        <button class="zoom-btn" data-z="out" title="缩小">−</button>
+        <span class="zoom-label">100%</span>
+        <button class="zoom-btn" data-z="in" title="放大">+</button>
+        <button class="zoom-btn wide" data-z="reset" title="重置">重置</button>
+      </div>
+      <div class="mermaid-wrap"><div class="mermaid" id="m${i}" data-zoom="1"></div></div>${legend}${cap}`;
     host.appendChild(card);
-    $("m" + i).textContent = d.mermaid;
+    $("m" + i).textContent = src;
+    bindZoom(card);
   });
-  if (typeof mermaid === "undefined") {
-    host.querySelectorAll(".mermaid").forEach((el, i) => {
-      const p = document.createElement("div");
-      p.className = "load-warn";
-      p.textContent = "⚠ mermaid 未加载（需联网）。源码：" + DATA.diagrams[i].mermaid.split("\n")[0] + " …";
-      el.parentNode.replaceChild(p, el);
+}
+
+// 每张图独立的缩放：按钮 + Ctrl/⌘+滚轮。缩放作用于 .mermaid（SVG 容器），.mermaid-wrap 做视窗滚动。
+// 默认 100%；上限 500%、下限 50%。
+const DEFAULT_ZOOM = 1, MAX_ZOOM = 5, MIN_ZOOM = 0.5;
+function bindZoom(card) {
+  const mEl = card.querySelector(".mermaid");
+  const label = card.querySelector(".zoom-label");
+  const applyZoom = (k) => {
+    k = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, Math.round(k * 100) / 100));
+    mEl.dataset.zoom = k;
+    mEl.style.zoom = k;
+    label.textContent = Math.round(k * 100) + "%";
+  };
+  card.querySelectorAll(".zoom-btn").forEach((b) => {
+    b.addEventListener("click", () => {
+      const cur = parseFloat(mEl.dataset.zoom || String(DEFAULT_ZOOM));
+      if (b.dataset.z === "in") applyZoom(cur * 1.15);
+      else if (b.dataset.z === "out") applyZoom(cur / 1.15);
+      else applyZoom(DEFAULT_ZOOM);
     });
-    return;
-  }
-  mermaid.initialize({ startOnLoad: false, theme: theme === "dark" ? "dark" : "default", securityLevel: "loose", flowchart: { curve: "basis" } });
+  });
+  card.querySelector(".mermaid-wrap").addEventListener("wheel", (e) => {
+    if (!e.ctrlKey && !e.metaKey) return; // 仅 Ctrl/⌘+滚轮缩放，普通滚轮正常滚页
+    e.preventDefault();
+    const cur = parseFloat(mEl.dataset.zoom || String(DEFAULT_ZOOM));
+    applyZoom(cur * (e.deltaY < 0 ? 1.1 : 1 / 1.1));
+  }, { passive: false });
+  applyZoom(DEFAULT_ZOOM); // 初始即 300%
+}
+
+function showLoadWarn() {
+  document.querySelectorAll(".mermaid").forEach((el, i) => {
+    const p = document.createElement("div");
+    p.className = "load-warn";
+    p.textContent = "⚠ mermaid 未加载（本地 mermaid.min.js 缺失且 CDN 不可达）。源码：" + (DATA.diagrams[i].mermaid.split("\n")[0]) + " …";
+    el.parentNode.replaceChild(p, el);
+  });
+}
+
+function runMermaid() {
+  if (typeof mermaid === "undefined") { showLoadWarn(); return; }
+  mermaid.initialize({
+    startOnLoad: false, securityLevel: "loose", theme: "base",
+    flowchart: { curve: "basis" }, themeVariables: THEME_VARS,
+  });
   mermaid.run({ querySelector: ".mermaid" }).catch((e) => console.warn("mermaid render error:", e));
+}
+
+function loadMermaidCdn(cb) {
+  const s = document.createElement("script");
+  s.src = "https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js";
+  s.onload = cb;
+  s.onerror = () => showLoadWarn();
+  document.head.appendChild(s);
 }
 
 function renderMarkdown(md) {
@@ -179,10 +340,8 @@ function applyTheme(theme) {
   currentTheme = theme;
   document.documentElement.setAttribute("data-theme", theme);
   $("theme-toggle").textContent = theme === "dark" ? "☀️ 浅色" : "🌙 深色";
-  renderDiagrams(theme);
+  // 图区固定浅色，切主题不重渲染 mermaid
 }
-
-function onMermaidLoaded() { renderDiagrams(currentTheme); }
 
 function init() {
   $("eyebrow").textContent = DATA.meta.eyebrow || "ARCH";
@@ -190,8 +349,9 @@ function init() {
   $("doc-subtitle").textContent = DATA.meta.subtitle || "";
   $("prose").innerHTML = renderMarkdown(DATA.content || "");
   $("theme-toggle").onclick = () => applyTheme(currentTheme === "dark" ? "light" : "dark");
-  // 若 CDN 已先于本脚本就绪（onload 已触发），直接渲染
-  if (typeof mermaid !== "undefined") renderDiagrams(currentTheme);
+  buildCards();
+  // 本地 mermaid 已就绪则直接渲染；缺失则回退 CDN
+  if (window.mermaid) runMermaid(); else loadMermaidCdn(runMermaid);
 }
 init();
 </script>
