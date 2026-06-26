@@ -19,6 +19,8 @@
   </script>
   <!-- highlight.js：代码语法高亮（可选；无网络时降级纯文本，仍可读）-->
   <script defer src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11/highlight.min.js"></script>
+  <!-- mermaid：时序图 / ER / 类 / 流程 / 状态等系统设计图（可选；无网络时降级显示源码）-->
+  <script defer src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
   <style>
 
     :root {
@@ -1293,6 +1295,49 @@
     .code-block .hljs-tag,
     .code-block .hljs-name { color: var(--coral); }
 
+    /* ===== 系统设计图（mermaid）：时序 / ER / 类 / 流程 / 状态 =====
+       写法：<div class="mermaid-block animate" style="--i:N"> mermaid 源码 </div>
+       纸质主题由 JS initialize 注入；加载失败或语法错时降级显示源码。 */
+    .mermaid-block {
+      margin-top: 18px;
+      padding: 20px 22px;
+      text-align: center;
+      background: #fffdf9;
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--lavender);
+      border-radius: var(--radius);
+      overflow-x: auto;
+      font-size: 15px;
+      color: var(--ink);
+      white-space: normal;
+    }
+    .mermaid-block svg { max-width: 100%; height: auto; }
+    .mermaid-block .mermaid-error {
+      display: block;
+      text-align: left;
+      white-space: pre;
+      color: var(--coral);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+    }
+    /* 纸质主题覆盖（mermaid themeVariables 对部分变量不生效，用 CSS 强制兜底）*/
+    .mermaid-block svg { display: block; margin: 0 auto; background: transparent; max-width: 100%; max-height: clamp(340px, 32cqi, 560px); width: auto !important; height: auto !important; }
+    .mermaid-block svg text { fill: var(--ink) !important; font-family: inherit !important; }
+    .mermaid-block svg rect,
+    .mermaid-block svg polygon,
+    .mermaid-block svg circle { fill: var(--paper-deep) !important; stroke: var(--line-strong) !important; }
+    .mermaid-block svg path,
+    .mermaid-block svg line { stroke: var(--muted) !important; fill: none !important; }
+    /* 按图类型轻量区分（克制用色）：actor 蓝、note 金、label 珊瑚、激活灰 */
+    .mermaid-block svg .actor { stroke: var(--blue) !important; }
+    .mermaid-block svg .note { stroke: var(--gold) !important; fill: rgba(244, 239, 230, 0.9) !important; }
+    .mermaid-block svg .labelBox { stroke: var(--coral) !important; }
+    .mermaid-block svg .activation0,
+    .mermaid-block svg .activation1 { fill: var(--line) !important; }
+    .mermaid-block svg .edgeLabel rect,
+    .mermaid-block svg .edgeLabel polygon { fill: var(--paper) !important; stroke: none !important; }
+    .mermaid-block svg .cluster rect { fill: rgba(244, 239, 230, 0.5) !important; stroke: var(--line-strong) !important; stroke-dasharray: 4 3 !important; }
+
     /* ===== 目录子页可点（章节为组头、子页缩进子项）===== */
     .nav-item.sub {
       grid-template-columns: 1fr;
@@ -1659,6 +1704,30 @@ func (s *OrderService) Create(ctx, cmd) (*Order, error) {
           </div>
         </section>
 
+        <!-- 模板⑨ 系统设计图（mermaid）：时序 / ER / 类 / 流程 / 状态 -->
+        <section class="slide dense" data-title="系统设计图">
+          <div class="slide-inner">
+            <p class="kicker animate" style="--i: 0">可选组件 · mermaid</p>
+            <h2 class="slide-title animate" style="--i: 1">用 mermaid 画系统设计图</h2>
+            <div class="mermaid-block animate" style="--i: 2">sequenceDiagram
+  participant U as 用户
+  participant API as API 网关
+  participant S as OrderService
+  participant DB as PostgreSQL
+  U->>API: POST /orders
+  API->>S: Create(cmd)
+  S->>DB: BEGIN / INSERT
+  DB-->>S: ok
+  S->>S: 发消息（异步）
+  S-->>API: order
+  API-->>U: 201 Created</div>
+            <aside class="note animate" style="--i: 3; margin-top: 16px">
+              <span class="label">支持类型</span>
+              <p>flowchart / sequence / class / ER / state / gantt —— 源码写在 <code class="inline-code">.mermaid-block</code> 里即自动渲染，纸质主题已注入。语法见 mermaid 官网。</p>
+            </aside>
+          </div>
+        </section>
+
         <div class="controls" aria-label="Slide controls">
           <button class="control-btn" id="prevBtn" type="button" aria-label="上一页">‹</button>
           <button class="control-btn" id="nextBtn" type="button" aria-label="下一页">›</button>
@@ -1755,8 +1824,9 @@ func (s *OrderService) Create(ctx, cmd) (*Order, error) {
 
     const next = () => showSlide(active + 1);
     const prev = () => showSlide(active - 1);
-    prevBtn.addEventListener("click", prev);
-    nextBtn.addEventListener("click", next);
+    // 控件按钮是可选元素（移动端 controls），不存在则跳过，绝不能在这里抛错中断后续渲染
+    if (prevBtn) prevBtn.addEventListener("click", prev);
+    if (nextBtn) nextBtn.addEventListener("click", next);
 
     // ====== 概览模式（o 唤出 / Esc 关闭，点击跳转）======
     function renderOverview() {
@@ -1828,6 +1898,57 @@ func (s *OrderService) Create(ctx, cmd) (*Order, error) {
     if (!highlightCode()) {
       let tries = 0;
       const timer = setInterval(() => { if (highlightCode() || ++tries > 25) clearInterval(timer); }, 200);
+    }
+
+    // ====== 系统设计图（mermaid 就绪后渲染，纸质主题）======
+    const mermaidPaperTheme = {
+      background: "#fbfaf6",
+      fontFamily: '"LXGW WenKai Screen","PingFang SC","Microsoft YaHei",sans-serif',
+      fontSize: "16px",
+      primaryColor: "#fffdf9", primaryTextColor: "#22211d", primaryBorderColor: "#4a6f91",
+      secondaryColor: "#f4efe6", secondaryTextColor: "#22211d", secondaryBorderColor: "#3e7e74",
+      tertiaryColor: "#fffdf9", tertiaryTextColor: "#22211d", tertiaryBorderColor: "#c76752",
+      textColor: "#22211d", lineColor: "#716d63",
+      mainBkg: "#fffdf9", nodeBorder: "#cfc3b0", clusterBkg: "#f4efe6", clusterBorder: "#cfc3b0",
+      edgeLabelBackground: "#fbfaf6",
+      actorBkg: "#fffdf9", actorBorder: "#4a6f91", actorTextColor: "#22211d", actorLineColor: "#716d63",
+      signalColor: "#716d63", signalTextColor: "#22211d",
+      labelBoxBkgColor: "#fffdf9", labelBoxBorderColor: "#c76752", labelTextColor: "#22211d",
+      loopTextColor: "#22211d", noteBkgColor: "#f4efe6", noteBorderColor: "#aa7a36", noteTextColor: "#22211d",
+      activationBkgColor: "#e3dacb", activationBorderColor: "#cfc3b0", sequenceNumberColor: "#fffdf9",
+      labelColor: "#22211d", altBackground: "#f4efe6",
+      attributeBackgroundColorOdd: "#fbfaf6", attributeBackgroundColorEven: "#f4efe6"
+    };
+    function renderMermaid() {
+      if (!window.mermaid) return false;
+      mermaid.initialize({
+        startOnLoad: false, theme: "base", securityLevel: "loose",
+        themeVariables: mermaidPaperTheme,
+        flowchart: { curve: "basis", htmlLabels: true },
+        sequence: { actorMargin: 50, boxMargin: 8, mirrorActors: false }
+      });
+      document.querySelectorAll(".mermaid-block").forEach((el) => {
+        if (el.dataset.rendered) return;
+        const code = el.textContent.trim();
+        if (!code) return;
+        const id = "mmd-" + Math.random().toString(36).slice(2, 9);
+        mermaid.render(id, code).then(({ svg }) => {
+          el.innerHTML = svg;
+          el.dataset.rendered = "1";
+        }).catch(() => {
+          el.dataset.rendered = "err";
+          const pre = document.createElement("pre");
+          pre.className = "mermaid-error";
+          pre.textContent = code;
+          el.innerHTML = "";
+          el.appendChild(pre);
+        });
+      });
+      return true;
+    }
+    if (!renderMermaid()) {
+      let mTries = 0;
+      const mTimer = setInterval(() => { if (renderMermaid() || ++mTries > 25) clearInterval(mTimer); }, 200);
     }
 
     // ====== 初始化 ======

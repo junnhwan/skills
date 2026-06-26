@@ -220,6 +220,36 @@ func (s *OrderService) Create(ctx, cmd) (*Order, error) {
 
 ---
 
+## 系统设计图（mermaid-block）
+
+画时序图 / ER 图 / 类图 / 流程图 / 状态图等**真正的系统设计图**——补齐方框箭头系（path-step / arch）画不了的场景。源码纯文本写进容器，自动渲染成 SVG（纸质主题已注入，与全局配色一致）。
+
+源码直接写在 `.mermaid-block` 里，**保持纯文本，不要加 `<span>` 之类标记**（与 code-block 自动高亮不同，mermaid 要原始文本）：
+
+    <div class="mermaid-block animate" style="--i: 4">sequenceDiagram
+      participant U as 用户
+      participant S as OrderService
+      participant DB as PostgreSQL
+      U->>S: 下单
+      S->>DB: 事务写入
+      S-->>U: 成功</div>
+
+支持的图型（换掉首行关键字与源码即可）：
+
+- `sequenceDiagram` — 时序图，请求链路 / 多方协作（面试最常用）。
+- `erDiagram` — ER 图，数据模型与关系。
+- `classDiagram` — 类图，领域模型 / 依赖关系。
+- `graph LR` / `graph TD` — 流程图，比 path-step 更复杂的分支拓扑。
+- `stateDiagram-v2` — 状态机。
+
+要点：
+
+- 加载不到 mermaid（无网络）或语法错时，**降级显示源码**（珊瑚色等宽），不白屏。
+- 一页一个图最清爽；图太宽自动横向滚动；大图配 `.dense` 页。
+- 语法参考 mermaid 官网（mermaid.js.org）。
+
+---
+
 ## Cover 页专用组件
 
 Cover 用 `.title`（不是 slide-title）、`.lead.hero-lead`、`.hero-meta`、`.chips`。完整结构见 `templates.md` 的 Cover 模板。

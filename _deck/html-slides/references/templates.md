@@ -188,6 +188,28 @@
 
 ---
 
+## 系统设计图（mermaid）
+
+时序 / ER / 类 / 状态等复杂图，用 `.mermaid-block` 写 mermaid 源码自动渲染（纸质主题）。**源码保持纯文本**（不要加 HTML 标记），写在容器里：
+
+    <section class="slide dense" data-title="下单时序">
+      <div class="slide-inner">
+        <p class="kicker animate" style="--i: 0">Part X / 时序</p>
+        <h2 class="slide-title animate" style="--i: 1">一次下单的完整时序</h2>
+        <div class="mermaid-block animate" style="--i: 2">sequenceDiagram
+      participant U as 用户
+      participant S as OrderService
+      participant DB as PostgreSQL
+      U->>S: 下单
+      S->>DB: 事务写入
+      S-->>U: 成功</div>
+      </div>
+    </section>
+
+无网络或语法错时降级显示源码。完整用法与图型见 `components.md` 的「系统设计图」。
+
+---
+
 ## 模板⑧ 面试笔记五层模板（拷打级）
 
 当目标是**面试准备**（不是知识科普）时，每个技术亮点走完整五层。这套结构对齐 `project-grill-prep` skill 的方法论——能扛住连环追问。

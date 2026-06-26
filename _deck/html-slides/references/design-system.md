@@ -105,6 +105,10 @@
 
 highlight.js（head 里 `defer` 加载）自动处理 `.code-block` 的纯文本内容，套用纸质低饱和主题（关键字 `--blue` / 字符串 `--green` / 注释 `--faint` / 数字 `--coral`）。`data-lang="go"` 指定语言；code-block 内一旦有子元素（如手动 `.c-comment`）则跳过自动高亮。无网络时降级为纯墨色等宽。
 
+## 系统设计图（mermaid）
+
+mermaid（head 里 `defer` 加载）渲染 `.mermaid-block` 里的源码为 SVG，套用纸质主题（`theme:'base'` + 注入的 `themeVariables`：节点 `#fffdf9` 米白、边线 `#716d63` 墨灰、actor 边 `--blue`、note `--gold` 等，与全局配色一致）。支持 sequenceDiagram / erDiagram / classDiagram / graph / stateDiagram-v2。改配色调 JS 里的 `mermaidPaperTheme`。无网络或语法错时降级为珊瑚色等宽源码。
+
 ## 字体加载
 
 霞鹜文楷走 jsdelivr 主源，`<link>` 的 `onerror` 回退到 unpkg；两端都失败则 fallback 到苹方/微软雅黑（`font-family` 栈已含）。换镜像改 head 脚本里 `primary` / `fallback` 两个 URL。
