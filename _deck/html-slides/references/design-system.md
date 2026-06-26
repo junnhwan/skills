@@ -79,3 +79,32 @@
 | `--shadow` | `0 24px 70px rgba(32,31,27,.12)` | deck 浮起阴影 |
 | `--side` | `320px` | 左侧目录栏宽度 |
 | `--frame-gap` | `16px` | 画布与窗口的安全间距 |
+
+## 交互（JS 内置，无需配置）
+
+| 操作 | 键 | 说明 |
+|---|---|---|
+| 翻页 | ←/→、Space、PageUp/Down | 前后翻 |
+| 首末页 | Home / End | 跳到第 1 / 最后 1 页 |
+| 跳页 | 1–9 | 跳到第 N 页 |
+| 概览 | `o` | 网格罗列所有页，点击跳转；`Esc` 关闭 |
+| 全屏 | `f` | 切换浏览器全屏 |
+
+左侧目录每页都可点：章节首页是组头，子页是缩进子项，点击直达任意页（不再只能跳章节首页）。
+
+## 无障碍
+
+- `@media (prefers-reduced-motion: reduce)`：自动禁用逐级淡入与位移，直接显示终态。
+- 所有可点元素（目录项、概览项、控制按钮）都是 `<button>`，支持键盘聚焦。
+
+## 打印 / 导出 PDF
+
+`@media print` 已配置：每页一张、隐藏侧栏与控件、动画归位。浏览器 `Ctrl/Cmd + P` → 另存为 PDF（建议横向、关闭页眉页脚）。
+
+## 代码高亮
+
+highlight.js（head 里 `defer` 加载）自动处理 `.code-block` 的纯文本内容，套用纸质低饱和主题（关键字 `--blue` / 字符串 `--green` / 注释 `--faint` / 数字 `--coral`）。`data-lang="go"` 指定语言；code-block 内一旦有子元素（如手动 `.c-comment`）则跳过自动高亮。无网络时降级为纯墨色等宽。
+
+## 字体加载
+
+霞鹜文楷走 jsdelivr 主源，`<link>` 的 `onerror` 回退到 unpkg；两端都失败则 fallback 到苹方/微软雅黑（`font-family` 栈已含）。换镜像改 head 脚本里 `primary` / `fallback` 两个 URL。

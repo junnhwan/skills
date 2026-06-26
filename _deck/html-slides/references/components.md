@@ -159,14 +159,13 @@
 页面里的补充说明 / 边注 / 「视角变化」类提示。
 
 ```html
-<aside class="note pip-clear animate" style="--i: 7; margin-top: 28px">
+<aside class="note animate" style="--i: 7; margin-top: 28px">
   <span class="label">关键设计</span>
   <p>这条链路里最值得注意的点：事务边界收敛在 Service 层。</p>
 </aside>
 ```
 
 - `label`：等宽小字标签（绿色）。
-- `pip-clear`：让 note 不受画中画布局约束、占满宽度。**笔记框都加上它**。
 
 ---
 
@@ -193,19 +192,30 @@
 
 ## 代码块（code-block）
 
-贴源码片段 / 命令 / 配置佐证。
+贴源码片段 / 命令 / 配置佐证。**默认自动语法高亮**（highlight.js，纸质低饱和配色）。
 
+两种写法：
+
+**① 自动高亮（推荐）**——直接写纯文本代码，可选 `data-lang` 指定语言（不写则自动检测）：
 ```html
-<div class="code-block animate" style="--i: 3"><span class="c-comment">// 事务边界收敛在 Service</span>
+<div class="code-block animate" data-lang="go" style="--i: 3">// 事务边界收敛在 Service
 func (s *OrderService) Create(ctx, cmd) (*Order, error) {
     return s.tx.Do(ctx, func(tx) error {
-        ...
+        // ...
     })
 }</div>
 ```
 
-- `c-comment`：注释高亮（淡色）。
-- 代码里若有 `<` `>` `&`，记得转义成 `&lt;` `&gt;` `&amp;`。
+**② 手动标记**——需要精确控制配色时，用 `<span class="c-comment">` 包注释。**一旦 code-block 内有任何子元素，自动高亮会跳过整段**，按你手写的标记渲染：
+```html
+<div class="code-block animate" style="--i: 3"><span class="c-comment">// 手动注释</span>
+其余代码纯文本…</div>
+```
+
+- `data-lang`：语言名（go / js / python / bash / sql …），命中 highlight.js 支持的语言。
+- 配色：关键字 `--blue`、字符串 `--green`、注释 `--faint`、数字 `--coral`（纸质低饱和，不刺眼）。
+- 无网络加载不到 highlight.js 时，降级为纯墨色等宽，仍可读。
+- 代码里的 `<` `>` `&` 仍建议转义成 `&lt;` `&gt;` `&amp;`，避免被当成 HTML 标签。
 - 行内代码用 `<code class="inline-code">…</code>`（表格里常用）。
 
 ---
@@ -213,6 +223,27 @@ func (s *OrderService) Create(ctx, cmd) (*Order, error) {
 ## Cover 页专用组件
 
 Cover 用 `.title`（不是 slide-title）、`.lead.hero-lead`、`.hero-meta`、`.chips`。完整结构见 `templates.md` 的 Cover 模板。
+
+---
+
+## 章节分隔页（section-divider）
+
+每个「Part」起点用的大字过渡页：拉开层次、给读者喘息。配合 `data-nav` 作为该章节的目录首页。
+
+```html
+<section class="slide section-divider" data-title="架构总览" data-nav="架构总览">
+  <div class="slide-inner">
+    <p class="part-label kicker animate" style="--i: 0">Part 01 / 架构</p>
+    <h2 class="part-title animate" style="--i: 1">先看全貌：这个项目由什么组成</h2>
+    <p class="part-sub animate" style="--i: 2">一句承上启下的导语。</p>
+    <hr class="part-rule animate" style="--i: 3" />
+  </div>
+</section>
+```
+
+- `.section-divider`：加在 `<section class="slide">` 上，启用分隔页布局（垂直居中、更宽内容区）。
+- `part-label`：左上小标签（Part 序号 + 主题）。`part-title`：超大衬线主标题。`part-sub`：导语。`part-rule`：珊瑚色短分割线。
+- **分隔页通常标 `data-nav`**——它就是这一章的目录首页，后续页只标 `data-title` 成为它的子项。
 
 ---
 

@@ -5,8 +5,20 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>代码笔记 Deck · 骨架模板</title>
-  <!-- 霞鹜文楷字体（可选；无网络时自动 fallback 到 PingFang / 微软雅黑）-->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont/style.css" />
+  <!-- 霞鹜文楷字体：jsdelivr 主源，失败回退 unpkg；两端都失败则用系统字体（苹方/微软雅黑）-->
+  <script>
+    (function () {
+      var primary = 'https://cdn.jsdelivr.net/npm/lxgw-wenkai-screen-webfont/style.css';
+      var fallback = 'https://unpkg.com/lxgw-wenkai-screen-webfont/style.css';
+      var link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = primary;
+      link.onerror = function () { if (this.href === primary) { this.onerror = null; this.href = fallback; } };
+      document.head.appendChild(link);
+    })();
+  </script>
+  <!-- highlight.js：代码语法高亮（可选；无网络时降级纯文本，仍可读）-->
+  <script defer src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11/highlight.min.js"></script>
   <style>
 
     :root {
@@ -33,10 +45,6 @@
       --deck-height: 900px;
       --deck-scale: 1;
       --frame-gap: 16px;
-      --pip-safe-width: clamp(260px, 22.5cqi, 360px);
-      --pip-safe-height: clamp(150px, 11.25cqi, 220px);
-      --pip-safe-gap: 28px;
-      --pip-lift: clamp(16px, 1.75cqi, 34px);
       --ease: cubic-bezier(0.22, 1, 0.36, 1);
       font-family:
         "LXGW WenKai Screen", "PingFang SC", "Hiragino Sans GB",
@@ -317,8 +325,7 @@
       display: grid;
       align-content: center;
       min-height: 0;
-      padding:
-        clamp(36px, 4.5cqi, 72px) clamp(36px, 4.5cqi, 72px) max(clamp(36px, 4.5cqi, 72px), calc(var(--pip-safe-height) + var(--pip-safe-gap))) clamp(36px, 4.5cqi, 72px);
+      padding: clamp(44px, 5.5cqi, 84px);
       opacity: 0;
       pointer-events: none;
       transform: translateX(18px);
@@ -335,13 +342,11 @@
 
     .slide.dense {
       align-content: start;
-      padding-top: clamp(28px, 2.875cqi, 46px);
-      padding-bottom: max(clamp(28px, 2.875cqi, 46px), calc(var(--pip-safe-height) + var(--pip-safe-gap)));
+      padding: clamp(34px, 3.75cqi, 56px) clamp(44px, 5.5cqi, 84px);
     }
 
     .slide.dense .slide-title {
       margin-bottom: 10px;
-      font-size: clamp(30px, 3cqi, 48px);
     }
 
     .slide.dense .two-col {
@@ -354,28 +359,15 @@
       padding: 20px;
     }
 
-    .slide.dense .material-table {
-      font-size: 13px;
-    }
-
     .slide.dense .material-table th,
     .slide.dense .material-table td {
-      padding: 9px 11px;
-    }
-
-    .slide.dense .note p {
-      font-size: 14px;
-      line-height: 1.65;
+      padding: 11px 13px;
     }
 
     .slide-inner {
       position: relative;
       width: min(1080px, 100%);
       margin: 0 auto;
-    }
-
-    .slide:not(.dense) .slide-inner {
-      transform: translateY(calc(-1 * var(--pip-lift)));
     }
 
     .kicker {
@@ -850,10 +842,6 @@
         rgba(255, 255, 255, 0.68);
     }
 
-    .pip-clear {
-      max-width: calc(100% - var(--pip-safe-width) - var(--pip-safe-gap));
-    }
-
     .note .label {
       display: inline-block;
       margin-bottom: 9px;
@@ -1091,196 +1079,6 @@
       }
     }
 
-    @media (max-aspect-ratio: 135 / 100) and (min-width: 981px),
-    (min-width: 981px) and (max-width: 1200px),
-    (min-width: 1201px) and (max-width: 1800px) and (min-height: 900px) {
-      :root {
-        --pip-safe-width: 260px;
-        --pip-safe-height: 150px;
-        --pip-safe-gap: 26px;
-        --pip-lift: 0px;
-      }
-
-      .deck {
-        grid-template-columns: 290px minmax(0, 1fr);
-      }
-
-      .slide {
-        align-content: start;
-        padding:
-          42px 56px max(44px, calc(var(--pip-safe-height) + var(--pip-safe-gap))) 56px;
-      }
-
-      .slide.dense {
-        padding-top: 34px;
-        padding-bottom: max(40px, calc(var(--pip-safe-height) + var(--pip-safe-gap)));
-      }
-
-      .slide:not(.dense) .slide-inner {
-        transform: none;
-      }
-
-      .slide-inner {
-        width: min(1120px, 100%);
-      }
-
-      .title {
-        max-width: 1120px;
-        font-size: clamp(46px, 4cqi, 64px);
-      }
-
-      .slide-title,
-      .slide.dense .slide-title {
-        max-width: 1120px;
-        font-size: clamp(36px, 3.125cqi, 50px);
-      }
-
-      .lead {
-        max-width: 980px;
-        font-size: clamp(21px, 1.625cqi, 26px);
-        line-height: 1.7;
-      }
-
-      .kicker {
-        font-size: 14px;
-      }
-
-      .two-col {
-        grid-template-columns: minmax(0, 1.12fr) minmax(250px, 0.88fr);
-        gap: 18px;
-        margin-top: 24px;
-      }
-
-      .three-col {
-        gap: 16px;
-        margin-top: 24px;
-      }
-
-      .card {
-        min-height: 152px;
-        padding: 20px;
-      }
-
-      .card h3,
-      .panel h3,
-      .note h3 {
-        font-size: 22px;
-      }
-
-      .card p,
-      .panel p,
-      .note p {
-        font-size: 17px;
-        line-height: 1.7;
-      }
-
-      .big-number {
-        font-size: 50px;
-      }
-
-      .agent-scenario {
-        margin-top: 22px;
-        padding: 20px 22px;
-      }
-
-      .agent-scenario p {
-        font-size: 19px;
-        line-height: 1.65;
-      }
-
-      .agent-module-map {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 12px;
-        margin-top: 18px;
-      }
-
-      .agent-module {
-        min-height: 124px;
-        padding: 14px;
-      }
-
-      .agent-module::after {
-        display: none;
-      }
-
-      .agent-module strong {
-        font-size: 18px;
-      }
-
-      .agent-module span {
-        font-size: 14px;
-        line-height: 1.5;
-      }
-
-      .material-table,
-      .slide.dense .material-table,
-      .langgraph-slide .material-table {
-        font-size: 15px;
-      }
-
-      .material-table th,
-      .material-table td,
-      .slide.dense .material-table th,
-      .slide.dense .material-table td,
-      .langgraph-slide .material-table th,
-      .langgraph-slide .material-table td {
-        padding: 12px 13px;
-        line-height: 1.48;
-      }
-
-      .material-table td:first-child {
-        width: 46%;
-      }
-
-      .material-table a {
-        min-height: 34px;
-        padding: 5px 9px;
-      }
-
-      .node {
-        padding: 14px 16px;
-      }
-
-      .node strong {
-        font-size: 17px;
-      }
-
-      .node span {
-        font-size: 14px;
-        line-height: 1.5;
-      }
-
-      .node::after {
-        height: 12px;
-        bottom: -13px;
-      }
-
-      .langgraph-slide .panel {
-        margin-top: 0;
-        padding: 20px;
-      }
-
-      .demian-quote-card {
-        margin-top: 20px;
-        padding: 28px 34px 26px;
-      }
-
-      .demian-quote-text {
-        font-size: clamp(19px, 1.5cqi, 24px);
-        line-height: 1.68;
-      }
-
-      .demian-reflection {
-        max-width: calc(100% - var(--pip-safe-width) - var(--pip-safe-gap));
-        margin-top: 16px;
-      }
-
-      .demian-reflection p {
-        font-size: 17px;
-        line-height: 1.7;
-      }
-    }
-
     @media (max-width: 980px) {
       body {
         overflow: auto;
@@ -1335,10 +1133,6 @@
         padding-bottom: 80px;
       }
 
-      .slide:not(.dense) .slide-inner {
-        transform: none;
-      }
-
       .controls {
         left: 22px;
         bottom: 20px;
@@ -1377,10 +1171,6 @@
         font-size: 16px;
       }
 
-      .pip-clear {
-        max-width: none;
-      }
-
       .path-step::after {
         display: none;
       }
@@ -1416,31 +1206,32 @@
     }
 
 
-    /* ===== 面试/高密度模式：字号放大 + 面试组件（Q&A / 架构图 / 深度徽章 / 要点框）===== */
-    .slide-title, .slide.dense .slide-title { font-size: clamp(34px, 2.9cqi, 50px) !important; }
-    .title { font-size: clamp(38px, 3.3cqi, 58px) !important; line-height: 1.25 !important; }
-    .lead, .hero-lead { font-size: clamp(19px, 1.5cqi, 26px) !important; line-height: 1.6 !important; }
-    .kicker { font-size: clamp(15px, 1.1cqi, 19px) !important; letter-spacing: 0.04em !important; }
-    .chip { font-size: 16px !important; }
-    .card h3 { font-size: clamp(22px, 1.8cqi, 27px) !important; }
-    .card p { font-size: clamp(17px, 1.38cqi, 22px) !important; line-height: 1.6 !important; }
-    .big-number { font-size: clamp(48px, 3.8cqi, 62px) !important; }
-    .agent-module strong { font-size: 20px !important; }
-    .agent-module span { font-size: 15px !important; line-height: 1.5 !important; }
-    .agent-module small { font-size: 13px !important; }
-    .path-step strong { font-size: 20px !important; }
-    .path-step span { font-size: 15px !important; line-height: 1.5 !important; }
-    .node strong { font-size: 19px !important; }
-    .node span { font-size: 15px !important; line-height: 1.55 !important; }
-    .material-table, .slide.dense .material-table { font-size: 16px !important; }
+    /* ===== 统一正文放大字号层（deck 上下文）：覆盖前面组件基础字号，集中维护 =====
+       改全局字号只动这里；不要再加 !important。source order 在末尾即生效。*/
+    .slide-title, .slide.dense .slide-title { font-size: clamp(34px, 2.9cqi, 50px); }
+    .title { font-size: clamp(38px, 3.3cqi, 58px); line-height: 1.25; }
+    .lead, .hero-lead { font-size: clamp(19px, 1.5cqi, 26px); line-height: 1.6; }
+    .kicker { font-size: clamp(15px, 1.1cqi, 19px); letter-spacing: 0.04em; }
+    .chip { font-size: 16px; }
+    .card h3 { font-size: clamp(22px, 1.8cqi, 27px); }
+    .card p { font-size: clamp(17px, 1.38cqi, 22px); line-height: 1.6; }
+    .big-number { font-size: clamp(48px, 3.8cqi, 62px); }
+    .agent-module strong { font-size: 20px; }
+    .agent-module span { font-size: 15px; line-height: 1.5; }
+    .agent-module small { font-size: 13px; }
+    .path-step strong { font-size: 20px; }
+    .path-step span { font-size: 15px; line-height: 1.5; }
+    .node strong { font-size: 19px; }
+    .node span { font-size: 15px; line-height: 1.55; }
+    .material-table, .slide.dense .material-table { font-size: 16px; }
     .material-table th, .material-table td,
     .slide.dense .material-table th, .slide.dense .material-table td {
-      font-size: 15px !important; padding: 11px 13px !important; line-height: 1.5 !important;
+      font-size: 15px; padding: 11px 13px; line-height: 1.5;
     }
-    .material-table td:first-child { width: auto !important; }
-    .note p { font-size: 18px !important; line-height: 1.6 !important; }
-    .note .label { font-size: 14px !important; }
-    .code-block { font-size: 15px !important; line-height: 1.65 !important; }
+    .material-table td:first-child { width: auto; }
+    .note p { font-size: 18px; line-height: 1.6; }
+    .note .label { font-size: 14px; }
+    .code-block { font-size: 15px; line-height: 1.65; }
 
     /* 架构分层图 */
     .arch { display: flex; flex-direction: column; align-items: stretch; gap: 0; margin-top: 22px; }
@@ -1482,6 +1273,161 @@
     .takeaway .label { display: inline-block; margin-bottom: 8px; color: var(--blue); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
     .takeaway p { font-size: 17px; line-height: 1.6; margin: 4px 0; }
     .takeaway strong { color: var(--ink); }
+
+    /* ===== 代码语法高亮（highlight.js 纸质低饱和主题）=====
+       无网络/未加载 hljs 时降级为纯墨色等宽，仍可读。 */
+    .code-block .hljs-keyword,
+    .code-block .hljs-built_in,
+    .code-block .hljs-selector-tag { color: var(--blue); font-weight: 600; }
+    .code-block .hljs-string,
+    .code-block .hljs-attr,
+    .code-block .hljs-meta-string { color: var(--green); }
+    .code-block .hljs-comment,
+    .code-block .hljs-quote { color: var(--faint); font-style: italic; }
+    .code-block .hljs-number,
+    .code-block .hljs-literal,
+    .code-block .hljs-symbol { color: var(--coral); }
+    .code-block .hljs-title,
+    .code-block .hljs-section { color: var(--lavender); font-weight: 600; }
+    .code-block .hljs-type { color: var(--gold); }
+    .code-block .hljs-tag,
+    .code-block .hljs-name { color: var(--coral); }
+
+    /* ===== 目录子页可点（章节为组头、子页缩进子项）===== */
+    .nav-item.sub {
+      grid-template-columns: 1fr;
+      gap: 0;
+      padding-left: clamp(32px, 3.4cqi, 46px);
+      padding-top: clamp(7px, 0.8cqi, 10px);
+      padding-bottom: clamp(7px, 0.8cqi, 10px);
+    }
+    .nav-item.sub .nav-subtitle {
+      margin-top: 0;
+      font-size: clamp(13px, 1.35cqi, 17px);
+      font-weight: 500;
+    }
+    .nav-item.sub.active .nav-subtitle { color: var(--nav-ink); }
+
+    /* ===== Part 章节分隔页 ===== */
+    .slide.section-divider { align-content: center; }
+    .slide.section-divider .slide-inner { width: min(1120px, 100%); }
+    .section-divider .part-label {
+      margin: 0 0 12px;
+      color: var(--coral);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: clamp(16px, 1.4cqi, 22px);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .section-divider .part-title {
+      margin: 0;
+      max-width: none;
+      font-family: Georgia, "Times New Roman", "Songti SC", serif;
+      font-size: clamp(54px, 6cqi, 96px);
+      font-weight: 500;
+      line-height: 1.05;
+      letter-spacing: 0;
+    }
+    .section-divider .part-sub {
+      max-width: 760px;
+      margin: 22px 0 0;
+      color: var(--muted);
+      font-size: clamp(19px, 1.6cqi, 26px);
+      line-height: 1.7;
+    }
+    .section-divider .part-rule {
+      width: 64px;
+      height: 3px;
+      margin: 28px 0 0;
+      background: var(--coral);
+      border: 0;
+    }
+
+    /* ===== 概览模式 overlay（按 o 唤出，网格罗列所有页）===== */
+    .overview-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      overflow: auto;
+      padding: clamp(24px, 4cqi, 56px);
+      background: rgba(251, 250, 246, 0.96);
+      backdrop-filter: blur(2px);
+    }
+    .overview-overlay.open { display: block; }
+    .overview-hint {
+      max-width: 1200px;
+      margin: 0 auto 18px;
+      color: var(--muted);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 14px;
+    }
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 14px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .overview-item {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 12px;
+      align-items: start;
+      width: 100%;
+      padding: 16px 18px;
+      text-align: left;
+      color: var(--nav-muted);
+      background: #fffdf9;
+      border: 1px solid var(--line);
+      border-left: 3px solid transparent;
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: color 200ms var(--ease), border-color 200ms var(--ease), transform 200ms var(--ease);
+    }
+    .overview-item:hover,
+    .overview-item:focus-visible {
+      color: var(--ink);
+      border-left-color: var(--coral);
+      transform: translateY(-2px);
+      outline: none;
+    }
+    .overview-item.current { border-left-color: var(--coral); color: var(--ink); background: rgba(255, 255, 255, 0.9); }
+    .overview-no {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 13px;
+      color: var(--faint);
+    }
+    .overview-title { font-size: 16px; font-weight: 600; line-height: 1.35; color: inherit; }
+
+    /* ===== 无障碍：尊重「减少动效」偏好 ===== */
+    @media (prefers-reduced-motion: reduce) {
+      .animate { opacity: 1 !important; transform: none !important; animation: none !important; }
+      .slide { transition: none !important; }
+      .nav-item, .resource, .control-btn, .overview-item { transition: none !important; }
+    }
+
+    /* ===== 打印 / 导出 PDF：每页一张 ===== */
+    @media print {
+      @page { size: 1720px 900px; margin: 0; }
+      html, body { overflow: visible !important; background: #fff !important; padding: 0 !important; }
+      .deck-shell { width: auto !important; height: auto !important; }
+      .deck-frame {
+        width: 1720px !important; height: auto !important; max-height: none !important;
+        transform: none !important; box-shadow: none !important; border: 0 !important; border-radius: 0 !important;
+      }
+      .deck-frame::before { display: none !important; }
+      .deck { grid-template-columns: 1fr !important; height: auto !important; }
+      .sidebar, .controls, .overview-overlay { display: none !important; }
+      .stage { height: auto !important; overflow: visible !important; }
+      .slide {
+        position: relative !important; inset: auto !important; page-break-after: always; break-after: page;
+        opacity: 1 !important; pointer-events: auto !important; transform: none !important;
+        padding: 64px 72px !important;
+      }
+      .slide:last-child { page-break-after: auto; break-after: auto; }
+      .animate { opacity: 1 !important; transform: none !important; animation: none !important; }
+    }
 
   </style>
 </head>
@@ -1536,8 +1482,18 @@
           </div>
         </section>
 
+        <!-- 模板②a Part 章节分隔页：大字过渡，用于每个 Part 起点 -->
+        <section class="slide section-divider" data-title="架构总览" data-nav="架构总览">
+          <div class="slide-inner">
+            <p class="part-label kicker animate" style="--i: 0">Part 01 / 架构</p>
+            <h2 class="part-title animate" style="--i: 1">先看全貌：<br />这个项目由什么组成</h2>
+            <p class="part-sub animate" style="--i: 2">从模块组成到请求流转，先建立整体地图，再钻进细节。</p>
+            <hr class="part-rule animate" style="--i: 3" />
+          </div>
+        </section>
+
         <!-- 模板② Part 分隔 + module-map 网格：模块组成/分层架构 -->
-        <section class="slide corner-kicker" data-title="整体架构" data-nav="整体架构">
+        <section class="slide corner-kicker" data-title="整体架构">
           <div class="slide-inner">
             <p class="kicker animate" style="--i: 0">Part 1 / 架构总览</p>
             <h2 class="slide-title animate" style="--i: 1">
@@ -1586,7 +1542,7 @@
               <div class="path-step animate" style="--i: 5"><strong>④ 持久化</strong><span>Repository 写库 + 缓存</span></div>
               <div class="path-step animate" style="--i: 6"><strong>⑤ 响应</strong><span>统一封装返回 JSON</span></div>
             </div>
-            <aside class="note pip-clear animate" style="--i: 7; margin-top: 28px">
+            <aside class="note animate" style="--i: 7; margin-top: 28px">
               <span class="label">关键设计</span>
               <p>这条链路里最值得注意的点：统一错误处理、事务边界、或缓存策略。</p>
             </aside>
@@ -1712,6 +1668,12 @@ func (s *OrderService) Create(ctx, cmd) (*Order, error) {
     </div>
   </div>
 
+  <!-- 概览模式 overlay（按 o 唤出）-->
+  <div class="overview-overlay" id="overview" aria-hidden="true">
+    <p class="overview-hint">共 <span id="overviewCount"></span> 页 · 点击跳转 · Esc 关闭</p>
+    <div class="overview-grid" id="overviewGrid"></div>
+  </div>
+
   <script>
 
     const root = document.documentElement;
@@ -1725,7 +1687,6 @@ func (s *OrderService) Create(ctx, cmd) (*Order, error) {
         root.style.setProperty("--deck-scale", "1");
         return;
       }
-
       const availableWidth = Math.max(window.innerWidth - desktopFrameGap, 0);
       const availableHeight = Math.max(window.innerHeight - desktopFrameGap, 0);
       const scale = Math.min(1, availableWidth / desktopFrameWidth, availableHeight / desktopFrameHeight);
@@ -1739,38 +1700,41 @@ func (s *OrderService) Create(ctx, cmd) (*Order, error) {
     const totalIndex = document.querySelector("#totalIndex");
     const prevBtn = document.querySelector("#prevBtn");
     const nextBtn = document.querySelector("#nextBtn");
+    const overview = document.getElementById("overview");
+    const overviewGrid = document.getElementById("overviewGrid");
     let active = 0;
 
-    const pad = (number) => String(number).padStart(2, "0");
+    const pad = (n) => String(n).padStart(2, "0");
     totalIndex.textContent = pad(slides.length);
 
-    // ====== 自动目录：给「章节起点」slide 加 data-nav="标题" 即可 ======
-    const navSections = [];
-    let _grp = null;
+    // ====== 自动目录：章节起点加 data-nav="标题"，子页只加 data-title ======
+    // 每页生成一个可点 nav 项：章节首页=组头(section)，其余=缩进子项(sub)。
+    const navEntries = [];
+    let _sectionNo = 0;
     slides.forEach((s, i) => {
-      const t = s.dataset.nav;
-      if (t) {
-        _grp = { index: i, no: String(navSections.length).padStart(2, "0"),
-                 title: t, subtitles: [] };
-        navSections.push(_grp);
-      } else if (_grp && s.dataset.title && s.dataset.title !== _grp.title) {
-        _grp.subtitles.push(s.dataset.title);
+      const navTitle = s.dataset.nav;
+      const title = s.dataset.title;
+      if (navTitle) {
+        _sectionNo += 1;
+        navEntries.push({ type: "section", slideIndex: i, no: pad(_sectionNo - 1), title: navTitle });
+      } else if (title && navEntries.length) {
+        const lastSec = navEntries.filter((e) => e.type === "section").pop();
+        if (!lastSec || lastSec.title !== title) {
+          navEntries.push({ type: "sub", slideIndex: i, no: "", title });
+        }
       }
     });
-    navSections.forEach((section) => {
+
+    navEntries.forEach((entry) => {
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "nav-item";
-      button.dataset.index = section.index;
-      button.innerHTML = `
-          <span class="nav-no">${section.no}</span>
-          <span>
-            <span class="nav-title">${section.title}</span>
-            ${section.subtitles
-              .map((subtitle) => `<span class="nav-subtitle">${subtitle}</span>`)
-              .join("")}
-          </span>`;
-      button.addEventListener("click", () => showSlide(section.index));
+      button.className = "nav-item " + entry.type;
+      button.dataset.index = entry.slideIndex;
+      button.innerHTML =
+        entry.type === "section"
+          ? `<span class="nav-no">${entry.no}</span><span class="nav-title">${entry.title}</span>`
+          : `<span class="nav-subtitle">${entry.title}</span>`;
+      button.addEventListener("click", () => showSlide(entry.slideIndex));
       nav.appendChild(button);
     });
 
@@ -1778,56 +1742,101 @@ func (s *OrderService) Create(ctx, cmd) (*Order, error) {
 
     function showSlide(index) {
       active = Math.max(0, Math.min(index, slides.length - 1));
-      slides.forEach((slide, slideIndex) => {
-        slide.classList.toggle("active", slideIndex === active);
-      });
-      navItems.forEach((item, itemIndex) => {
-        const start = navSections[itemIndex].index;
-        const next = navSections[itemIndex + 1]?.index ?? slides.length;
-        const isActiveSection = active >= start && active < next;
-        item.classList.toggle("active", isActiveSection);
-        item.setAttribute("aria-current", isActiveSection ? "page" : "false");
+      slides.forEach((slide, i) => slide.classList.toggle("active", i === active));
+      // 精确高亮当前页对应的 nav 项
+      navItems.forEach((item) => {
+        const on = Number(item.dataset.index) === active;
+        item.classList.toggle("active", on);
+        item.setAttribute("aria-current", on ? "page" : "false");
       });
       currentIndex.textContent = pad(active + 1);
       progress.style.width = `${((active + 1) / slides.length) * 100}%`;
     }
 
-    function next() {
-      showSlide(active + 1);
-    }
-
-    function prev() {
-      showSlide(active - 1);
-    }
-
+    const next = () => showSlide(active + 1);
+    const prev = () => showSlide(active - 1);
     prevBtn.addEventListener("click", prev);
     nextBtn.addEventListener("click", next);
 
+    // ====== 概览模式（o 唤出 / Esc 关闭，点击跳转）======
+    function renderOverview() {
+      if (!overviewGrid) return;
+      const countEl = document.getElementById("overviewCount");
+      if (countEl) countEl.textContent = slides.length;
+      overviewGrid.innerHTML = "";
+      slides.forEach((s, i) => {
+        const title = s.dataset.nav || s.dataset.title || "第 " + (i + 1) + " 页";
+        const item = document.createElement("button");
+        item.type = "button";
+        item.className = "overview-item" + (i === active ? " current" : "");
+        item.innerHTML = `<span class="overview-no">${pad(i + 1)}</span><span class="overview-title">${title}</span>`;
+        item.addEventListener("click", () => { showSlide(i); closeOverview(); });
+        overviewGrid.appendChild(item);
+      });
+    }
+    function openOverview() { renderOverview(); overview && overview.classList.add("open"); }
+    function closeOverview() { overview && overview.classList.remove("open"); }
+    function toggleOverview() {
+      if (overview && overview.classList.contains("open")) closeOverview();
+      else openOverview();
+    }
+
+    // ====== 全屏（f）======
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen && document.documentElement.requestFullscreen();
+      } else {
+        document.exitFullscreen && document.exitFullscreen();
+      }
+    }
+
+    // ====== 键盘：←/→/Space/PageUp/Down/Home/End 翻页；o 概览；f 全屏；1–9 跳页 ======
     window.addEventListener("keydown", (event) => {
-      if (["ArrowRight", "PageDown", " "].includes(event.key)) {
-        event.preventDefault();
-        next();
-      }
-      if (["ArrowLeft", "PageUp"].includes(event.key)) {
-        event.preventDefault();
-        prev();
-      }
-      if (event.key === "Home") {
-        event.preventDefault();
-        showSlide(0);
-      }
-      if (event.key === "End") {
-        event.preventDefault();
-        showSlide(slides.length - 1);
+      const overviewOpen = overview && overview.classList.contains("open");
+      if (event.key === "Escape") { if (overviewOpen) { event.preventDefault(); closeOverview(); } return; }
+      if (event.key === "o" || event.key === "O") { event.preventDefault(); toggleOverview(); return; }
+      if (event.key === "f" || event.key === "F") { event.preventDefault(); toggleFullscreen(); return; }
+      if (overviewOpen) return; // 概览开着时不响应翻页
+      if (["ArrowRight", "PageDown", " "].includes(event.key)) { event.preventDefault(); next(); }
+      if (["ArrowLeft", "PageUp"].includes(event.key)) { event.preventDefault(); prev(); }
+      if (event.key === "Home") { event.preventDefault(); showSlide(0); }
+      if (event.key === "End") { event.preventDefault(); showSlide(slides.length - 1); }
+      if (/^[1-9]$/.test(event.key)) {
+        const n = Number(event.key);
+        if (n <= slides.length) { event.preventDefault(); showSlide(n - 1); }
       }
     });
 
+    // ====== 代码语法高亮（highlight.js 就绪后执行）======
+    function highlightCode() {
+      if (!window.hljs) return false;
+      document.querySelectorAll(".code-block").forEach((el) => {
+        if (el.children.length > 0) return; // 已有手动标记（如 .c-comment），跳过
+        const text = el.textContent;
+        if (!text.trim()) return;
+        try {
+          const lang = el.dataset.lang;
+          const res = lang
+            ? hljs.highlight(text, { language: lang, ignoreIllegals: true })
+            : hljs.highlightAuto(text);
+          el.innerHTML = res.value;
+          el.classList.add("hljs");
+        } catch (e) { /* 语言不支持则降级纯文本 */ }
+      });
+      return true;
+    }
+    if (!highlightCode()) {
+      let tries = 0;
+      const timer = setInterval(() => { if (highlightCode() || ++tries > 25) clearInterval(timer); }, 200);
+    }
+
+    // ====== 初始化 ======
     const params = new URLSearchParams(window.location.search);
     const requestedSlide = Number.parseInt(params.get("slide") || "1", 10);
     updateDeckScale();
     window.addEventListener("resize", updateDeckScale);
     showSlide(Number.isFinite(requestedSlide) ? requestedSlide - 1 : 0);
-  
+
   </script>
 </body>
 

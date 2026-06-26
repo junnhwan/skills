@@ -48,6 +48,23 @@
 
 ---
 
+## 模板①b Part 章节分隔页
+
+每个 Part 起点的大字过渡页，标 `data-nav` 作为该章目录首页（组件写法见 `components.md` 的「章节分隔页」）。
+
+```html
+<section class="slide section-divider" data-title="架构总览" data-nav="架构总览">
+  <div class="slide-inner">
+    <p class="part-label kicker animate" style="--i: 0">Part 01 / 架构</p>
+    <h2 class="part-title animate" style="--i: 1">先看全貌：这个项目由什么组成</h2>
+    <p class="part-sub animate" style="--i: 2">从模块组成到请求流转，先建立整体地图。</p>
+    <hr class="part-rule animate" style="--i: 3" />
+  </div>
+</section>
+```
+
+---
+
 ## 模板② Part 分隔 + 模块网格
 
 ```html
