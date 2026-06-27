@@ -48,8 +48,8 @@ description: |
 **好处**：更容易被 skill loading 系统匹配，也更清晰地说明了使用场景。
 
 **适用文件**：
-- `_deck/step-viz-note/SKILL.md`
-- `_deck/arch-viz-note/SKILL.md`
+- `_deck/viz/step-viz-note/SKILL.md`
+- `_deck/viz/arch-viz-note/SKILL.md`
 - `_deck/proj-to-showcase/SKILL.md`
 
 ---

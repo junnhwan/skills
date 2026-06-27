@@ -10,11 +10,16 @@
 
 ```text
 skills/
-├─ learn-vibe-coded-project/   # 主力：逐文件学习陌生或 vibe-coded 项目
-├─ project-interview-grill/    # 主力：项目简历防守、证据审计、面试拷打
-├─ _deck/                      # 可视化笔记、HTML deck、项目讲解材料
-├─ _incubating/                # 实验中或待合并的 skill
-└─ _archive/                   # 旧版、被替代、暂不主动使用的 skill
+├─ learn-vibe-coded-project/       # 主力：逐文件学习陌生或 vibe-coded 项目
+├─ project-interview-grill/        # 主力：项目简历防守、证据审计、面试拷打
+├─ _deck/
+│  ├─ viz/                         # 单文件可视化笔记（arch-viz-note, step-viz-note, leetcode-viz）
+│  ├─ slides/                      # 单文件 HTML 演示 deck（html-slides, tech-deep-dive, project-notes-html-deck）
+│  ├─ sites/                       # 多页站点生成（proj-to-learn-site, project-to-book）
+│  ├─ proj-to-showcase/            # 编排层：批量调用 viz/ 生成展示材料
+│  └─ _meta/                       # 优化建议、通用参考文档
+├─ _incubating/                    # 实验中或待合并的 skill
+└─ _archive/                       # 旧版、被替代、暂不主动使用的 skill
 ```
 
 ## 主力 Skills
@@ -73,13 +78,28 @@ skills/
 
 ### `_deck/`
 
-放可视化输出类 skill，例如：
+放可视化输出类 skill，按用途分组：
 
-- `html-slides`: 把源码、文档或学习笔记做成 HTML slide deck
-- `project-notes-html-deck`: 为项目生成可视化学习/面试笔记
-- `tech-deep-dive`: 生成交互式 HTML 技术深潜文档
+**`viz/`** — 单文件可视化笔记：
 
-这些 skill 不作为默认主力流程。只有当目标明确是“做 HTML/PPT/可视化笔记”时再使用。
+- `arch-viz-note`: mermaid 架构图、模块依赖图、目录树
+- `step-viz-note`: SVG 步进动效流程图 + 消息流模拟器
+- `leetcode-viz`: LeetCode 题目交互式可视化
+
+**`slides/`** — 单文件 HTML 演示 deck：
+
+- `html-slides`: 纸质杂志风格 HTML slide deck
+- `tech-deep-dive`: 交互式技术深潜文档（5 种输入模式）
+- `project-notes-html-deck`: 源码证据驱动的项目面试笔记 deck
+
+**`sites/`** — 多页站点生成：
+
+- `proj-to-learn-site`: 项目→ Next.js 交互式教程站
+- `project-to-book`: 项目→ VitePress 文档/书站
+
+**`proj-to-showcase/`** — 编排层，批量调用 `viz/` 生成展示材料。
+
+这些 skill 不作为默认主力流程。只有当目标明确是”做 HTML/PPT/可视化笔记”时再使用。
 
 ### `_incubating/`
 
